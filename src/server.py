@@ -8,11 +8,11 @@ import os
 import asyncio
 import time
 import sys
-import os
 
 # Add project root to sys.path to allow running as script
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import dspy
 from src.prompt_optimizer import PromptOptimizer
 
 app = FastAPI()
@@ -30,12 +30,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Optimizer
-api_key = os.environ.get("GOOGLE_API_KEY")
+# Initialize API Key and Configure DSPy BEFORE creating optimizer
+api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 if not api_key:
-    print("WARNING: GOOGLE_API_KEY not found in environment")
+    print("❌ WARNING: GOOGLE_API_KEY not found in environment - evaluators will fail!")
+else:
+    # Configure DSPy at module level so all evaluators have access
+    try:
+        lm = dspy.LM("gemini/gemini-2.5-flash-lite-preview-09-2025", api_key=api_key)
+        dspy.configure(lm=lm)
+        print("✅ DSPy configured successfully with Gemini 2.5 Flash Lite")
+    except Exception as e:
+        print(f"❌ DSPy configuration failed: {e}")
+        # Try fallback model
+        try:
+            lm = dspy.LM("gemini/gemini-2.0-flash-exp", api_key=api_key)
+            dspy.configure(lm=lm)
+            print("✅ DSPy configured with fallback model (Gemini 2.0 Flash)")
+        except Exception as e2:
+            print(f"❌ DSPy fallback also failed: {e2}")
 
-# Global optimizer instance
+# Global optimizer instance (now DSPy is configured)
 optimizer = PromptOptimizer(api_key=api_key)
 
 class PromptRequest(BaseModel):
@@ -68,6 +83,7 @@ async def generate(request: PromptRequest):
                     yield f"data: {json.dumps({'type': 'fibo_json', 'json_prompt': json_prompt})}\n\n"
                 except:
                     json_prompt = {"description": request.prompt}
+                    yield f"data: {json.dumps({'type': 'fibo_json', 'json_prompt': json_prompt})}\n\n"
                 
                 # 2. Stream Generation
                 yield f"data: {json.dumps({'type': 'status', 'message': 'Streaming images...', 'step': 'generation'})}\n\n"
