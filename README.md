@@ -205,80 +205,154 @@ In Scenenapse, GEPA optimizes the `PromptRewriter` module to learn from failed g
 
 ## Setup
 
-### 1. Activate Virtual Environment
+### 1. Clone the Repository
 
 ```bash
-source .venv/bin/activate
+git clone https://github.com/dataphysician/scenenapse.git
+cd scenenapse
 ```
 
-### 2. Install Dependencies
+### 2. Create and Activate Virtual Environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+# or
+.venv\Scripts\activate     # Windows
+```
+
+### 3. Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Set API Key
+### 4. Set API Key
 
 ```bash
-export GOOGLE_API_KEY="your-key-here"
+export GOOGLE_API_KEY="your-gemini-api-key"
+# or
+export GEMINI_API_KEY="your-gemini-api-key"
 ```
+
+You can get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ---
 
-## Usage
+## Running the Application
 
-### Web UI (Recommended)
+### Option A: Next.js Frontend (Recommended)
 
-Launch the Gradio frontend:
+This provides a modern, responsive UI with real-time streaming updates.
+
+**Terminal 1 - Start the Backend Server:**
 
 ```bash
-python frontend/app.py
+cd scenenapse
+source .venv/bin/activate
+python src/server.py
 ```
 
-Then open http://localhost:7860 in your browser.
+The FastAPI server will start at `http://localhost:8000`.
 
-<p align="center">
-  <img src="https://via.placeholder.com/800x500?text=Scenenapse+UI" width="700" alt="Scenenapse UI">
-</p>
+**Terminal 2 - Start the Frontend:**
+
+```bash
+cd scenenapse/frontend
+npm install        # First time only
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser.
 
 **Features:**
-- **Mode Selection**: Choose between "Regular Nano Banana Pro" (fast) or "Prompt Optimized" (VISTA loop)
-- **Image Grid**: View all 10 generated variations in a 2x5 grid (click to expand)
+- **Mode Selection**: Toggle between "Prompt Optimization" (VISTA loop) or "Nano Banana Pro" (fast)
+- **Image Grid**: View all 10 generated variations in a 5-column grid (click to expand)
+- **FIBO JSON Display**: See structured prompts in the System Logs panel
 - **Real-time Scoring**: JoyQuality scores displayed for each seed
 - **Live Evaluation**: Watch Quality and Alignment checkers run with pass/fail indicators
 - **Auto-Rewrite**: Failed prompts automatically rewritten and retried
 - **History Sidebar**: Track previous generations
 
-### CLI Pipeline
+---
+
+### Option B: Gradio Frontend
+
+A simpler alternative using Gradio (no Node.js required).
 
 ```bash
+cd scenenapse
+source .venv/bin/activate
+python frontend/app.py
+```
+
+Open `http://localhost:7860` in your browser.
+
+---
+
+### Option C: CLI Pipeline
+
+Run the optimizer directly from the command line:
+
+```bash
+cd scenenapse
+source .venv/bin/activate
 python -m src.prompt_optimizer
 ```
 
-### Run Individual Components
+---
+
+## Run Individual Components
 
 ```bash
-# FIBO Generator
+# FIBO Generator (Text → JSON prompt)
 python src/fibo_generator.py
 
-# JoyQuality Selector
+# JoyQuality Selector (Image → Quality score)
 python src/joy_quality.py
 
-# Nano Banana Pro API
+# Nano Banana Pro API (JSON → Image)
 python src/nano_banana.py
 
-# GEPA Trainer
+# GEPA Trainer (Optimize prompt rewriter)
 python src/gepa_trainer.py
 ```
 
-### Troubleshooting
+---
 
-If `python` complains about missing modules:
+## Troubleshooting
+
+### Module not found errors
+
+Ensure you're using the virtual environment's Python:
 
 ```bash
-./.venv/bin/python src/joy_quality.py
-# or for frontend
+./.venv/bin/python src/server.py
+# or
 ./.venv/bin/python frontend/app.py
+```
+
+### DSPy "No LM is loaded" error
+
+Make sure your API key is set before starting the server:
+
+```bash
+export GOOGLE_API_KEY="your-key"
+python src/server.py
+```
+
+### Frontend can't connect to backend
+
+1. Verify the backend is running on port 8000
+2. Check for CORS errors in browser console
+3. Ensure both servers are running simultaneously (2 terminals)
+
+### npm install fails
+
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
 ```
 
 ---
