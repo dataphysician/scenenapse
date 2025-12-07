@@ -64,7 +64,20 @@ Scenenapse adapts Google's [VISTA](https://arxiv.org/abs/2510.15831) self-improv
 
 [VISTA](https://g-vista.github.io/) (Video Iterative Self-improvemenT Agent) is Google's multi-agent system for autonomous video generation improvement through iterative prompt refinement. It achieves **60% better objective benchmarks** and **66.4% human preference** over baselines by using structured scene planning, pairwise tournament selection, and multi-dimensional critiques.
 
-**Scenenapse adapts this for T2I** by replacing video-specific components with image-focused alternatives while preserving the core self-improvement loop.
+<p align="center">
+  <img src="assets/vista-workflow.png" width="800" alt="VISTA Workflow">
+  <br>
+  <em>Figure 1: The workflow of VISTA's multi-agent framework. (Source: <a href="https://arxiv.org/abs/2510.15831">Long et al., 2025</a>)</em>
+</p>
+
+**Scenenapse adapts this for T2I** by replacing video-specific components with image-focused alternatives while preserving the core self-improvement loop:
+
+| VISTA Component | Scenenapse Equivalent |
+|-----------------|----------------------|
+| 1. Structured Video Prompt Planning | FIBO JSON Generator |
+| 2. Binary Tournament Selection | JoyQuality SigLIP2 Scoring |
+| 3. Multi-Agent Critiques | Quality + Alignment Checkers |
+| 4. Deep Thinking Prompting Agent | GEPA-Optimized Rewriter |
 
 | Paper | [arXiv:2510.15831](https://arxiv.org/abs/2510.15831) |
 |-------|------------------------------------------------------|
