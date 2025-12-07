@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, CheckCircle2, XCircle, LayoutGrid, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Send, CheckCircle2, XCircle, LayoutGrid, Sparkles, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 
 // Types
 type LogMessage = {
@@ -33,6 +33,11 @@ export default function Home() {
   const [bestImage, setBestImage] = useState<GeneratedImage | null>(null);
   const [evalResult, setEvalResult] = useState<any>(null);
   const [history, setHistory] = useState<string[]>([]);
+
+  // FIBO State
+  const [fiboPrompt, setFiboPrompt] = useState<any>(null);
+  const [showFibo, setShowFibo] = useState(true);
+
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll logs
@@ -52,6 +57,8 @@ export default function Home() {
     setImages([]);
     setBestImage(null);
     setEvalResult(null);
+    setFiboPrompt(null);
+    setShowFibo(true);
 
     // Add to history
     if (!history.includes(prompt)) {
@@ -105,14 +112,15 @@ export default function Home() {
         break;
       case "image_generated":
         setImages(prev => {
-          const newImages = [...prev, event];
+          let newImages = [...prev];
+          if (event.is_best) {
+            // If new image is best, remove status from all others
+            newImages = newImages.map(img => ({ ...img, is_best: false }));
+          }
+          newImages.push(event);
           // Sort by seed to keep grid stable
           return newImages.sort((a, b) => a.seed - b.seed);
         });
-        if (event.is_best) {
-          // Wait for explicit selection usually regarding final, but here update realtime
-          // Actually best updates dynamically
-        }
         break;
       case "best_selected":
         addLog({ type: "info", message: `🏆 Best Candidate Selected (Score: ${event.score.toFixed(4)})`, highlight: true });
@@ -136,7 +144,8 @@ export default function Home() {
         addLog({ type: "error", message: event.message });
         break;
       case "fibo_json":
-        addLog({ type: "info", message: "Struct: " + JSON.stringify(event.json_prompt).slice(0, 50) + "..." });
+        setFiboPrompt(event.json_prompt);
+        addLog({ type: "info", message: "Struct: FIBO Prompt Generated" });
         break;
     }
   };
@@ -187,6 +196,31 @@ export default function Home() {
 
           {/* Center Canvas (Grid) */}
           <div className="flex-1 p-6 overflow-y-auto">
+
+            {/* FIBO Prompt Display */}
+            {fiboPrompt && (
+              <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
+                <div
+                  className="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center cursor-pointer hover:bg-slate-800 transition-colors"
+                  onClick={() => setShowFibo(!showFibo)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">FIBO Structured Prompt</span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    {showFibo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+                </div>
+
+                {showFibo && (
+                  <div className="p-4 bg-slate-950/80 font-mono text-xs text-green-400 overflow-x-auto">
+                    <pre>{JSON.stringify(fiboPrompt, null, 2)}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-5 gap-4 auto-rows-min">
               {images.map((img) => (
                 <Dialog key={img.seed}>

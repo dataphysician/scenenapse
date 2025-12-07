@@ -41,6 +41,16 @@ class PromptOptimizer:
         
         # Initialize components
         print("Initializing Prompt Optimizer...")
+
+        # Configure DSPy globally 
+        # (This is required for all dspy.Module components)
+        try:
+             lm = dspy.LM(evaluator_model, api_key=api_key)
+             dspy.configure(lm=lm)
+             print(f"DSPy configured with LM: {evaluator_model}")
+        except Exception as e:
+             print(f"Warning: Failed to configure default DSPy LM: {e}")
+
         
         # FIBO Generator (uses Gemini 3)
         self.fibo = FIBOGenerator()
