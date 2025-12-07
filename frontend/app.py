@@ -69,43 +69,6 @@ class AppState:
 state = AppState()
 
 
-# CSS for custom styling
-CUSTOM_CSS = """
-.chat-container {
-    max-height: 400px;
-    overflow-y: auto;
-}
-.image-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-}
-.image-card {
-    cursor: pointer;
-    border-radius: 8px;
-    transition: transform 0.2s;
-}
-.image-card:hover {
-    transform: scale(1.05);
-}
-.check-pass {
-    color: #22c55e;
-    font-weight: bold;
-}
-.check-fail {
-    color: #ef4444;
-    font-weight: bold;
-}
-.status-message {
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
-}
-.sidebar {
-    min-width: 200px;
-    max-width: 250px;
-}
-"""
 
 
 def format_checker_result(name: str, passed: bool) -> str:
@@ -373,14 +336,7 @@ def on_image_select(evt: gr.SelectData, gallery):
 def create_app():
     """Create and return the Gradio app."""
 
-    with gr.Blocks(
-        title="Scenenapse",
-        css=CUSTOM_CSS,
-        theme=gr.themes.Soft(
-            primary_hue="blue",
-            secondary_hue="slate",
-        )
-    ) as app:
+    with gr.Blocks(title="Scenenapse") as app:
 
         gr.Markdown("""
         # 🎨 Scenenapse
