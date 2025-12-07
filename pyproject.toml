@@ -9,6 +9,7 @@ dependencies = [
     "boltons>=25.0.0",
     "diffusers>=0.35.2",
     "dspy-ai>=2.5.0",
+    "fastapi>=0.124.0",
     "google-genai>=1.53.0",
     "pillow>=10.0.0",
     "requests>=2.31.0",
@@ -16,4 +17,5 @@ dependencies = [
     "torchvision>=0.24.1",
     "transformers>=4.40.0",
     "ujson>=5.11.0",
+    "uvicorn>=0.38.0",
 ]

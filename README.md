@@ -214,7 +214,29 @@ export GOOGLE_API_KEY="your-key-here"
 
 ## Usage
 
-### Run the Full Pipeline
+### Web UI (Recommended)
+
+Launch the Gradio frontend:
+
+```bash
+python frontend/app.py
+```
+
+Then open http://localhost:7860 in your browser.
+
+<p align="center">
+  <img src="https://via.placeholder.com/800x500?text=Scenenapse+UI" width="700" alt="Scenenapse UI">
+</p>
+
+**Features:**
+- **Mode Selection**: Choose between "Regular Nano Banana Pro" (fast) or "Prompt Optimized" (VISTA loop)
+- **Image Grid**: View all 10 generated variations in a 2x5 grid (click to expand)
+- **Real-time Scoring**: JoyQuality scores displayed for each seed
+- **Live Evaluation**: Watch Quality and Alignment checkers run with pass/fail indicators
+- **Auto-Rewrite**: Failed prompts automatically rewritten and retried
+- **History Sidebar**: Track previous generations
+
+### CLI Pipeline
 
 ```bash
 python -m src.prompt_optimizer
@@ -242,6 +264,8 @@ If `python` complains about missing modules:
 
 ```bash
 ./.venv/bin/python src/joy_quality.py
+# or for frontend
+./.venv/bin/python frontend/app.py
 ```
 
 ---
