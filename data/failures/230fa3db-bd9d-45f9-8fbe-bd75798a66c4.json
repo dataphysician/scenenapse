@@ -1,0 +1,11 @@
+{
+  "id": "230fa3db-bd9d-45f9-8fbe-bd75798a66c4",
+  "original_prompt": "A bad prompt",
+  "quality_feedback": "Bad quality",
+  "alignment_feedback": "Wrong subject",
+  "json_prompt": {
+    "some": "json"
+  },
+  "image_path": null,
+  "improved_prompt": null
+}
