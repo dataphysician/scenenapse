@@ -145,7 +145,12 @@ export default function Home() {
         break;
       case "fibo_json":
         setFiboPrompt(event.json_prompt);
-        addLog({ type: "info", message: "Struct: FIBO Prompt Generated" });
+        // Display FIBO JSON in the System Logs chat window
+        addLog({
+          type: "info",
+          message: `📋 FIBO Structured Prompt:\n${JSON.stringify(event.json_prompt, null, 2)}`,
+          highlight: true
+        });
         break;
     }
   };
