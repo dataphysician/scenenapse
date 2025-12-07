@@ -50,6 +50,13 @@ class PromptOptimizer:
              print(f"DSPy configured with LM: {evaluator_model}")
         except Exception as e:
              print(f"Warning: Failed to configure default DSPy LM: {e}")
+             print("Attempting fallback to gemini-2.0-flash-exp...")
+             try:
+                 lm = dspy.LM("gemini/gemini-2.0-flash-exp", api_key=api_key)
+                 dspy.configure(lm=lm)
+                 print("DSPy configured with Fallback LM: gemini-2.0-flash-exp")
+             except Exception as e2:
+                 print(f"Critical Warning: Failed to configure Fallback DSPy LM: {e2}")
 
         
         # FIBO Generator (uses Gemini 3)
@@ -272,7 +279,8 @@ class PromptOptimizer:
                 yield {"type": "fibo_json", "json_prompt": json_prompt}
             except Exception as e:
                 yield {"type": "error", "message": f"FIBO Error: {e}"}
-                json_prompt = {"prompt": current_prompt}
+                json_prompt = {"prompt": current_prompt, "fallback": True}
+                yield {"type": "fibo_json", "json_prompt": json_prompt}
             
             # 2. Nano Banana
             yield {"type": "status", "message": f"Streaming {self.num_seeds} images...", "step": "generation"}
