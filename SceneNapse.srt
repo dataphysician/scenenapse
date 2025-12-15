@@ -1,0 +1,172 @@
+1
+00:00:03,199 --> 00:00:05,959
+Welcome to Scene Naps Studio. We're
+
+2
+00:00:06,000 --> 00:00:08,140
+solving a real problem in text-to-image
+
+3
+00:00:08,220 --> 00:00:10,699
+generation. Prompts are messy,
+
+4
+00:00:10,760 --> 00:00:12,960
+unstructured, and when the image doesn't
+
+5
+00:00:13,039 --> 00:00:15,079
+match what you pictured, you usually have
+
+6
+00:00:15,159 --> 00:00:18,159
+no idea what went wrong or what to change.
+
+7
+00:00:18,280 --> 00:00:20,440
+Scene Naps fixes this with a simple
+
+8
+00:00:20,600 --> 00:00:23,899
+two-phase pipeline. Phase 1 is prompt
+
+9
+00:00:23,959 --> 00:00:26,760
+enhancement. You start with a plain prompt
+
+10
+00:00:26,860 --> 00:00:29,199
+like, "A woman walking through a neon
+
+11
+00:00:29,260 --> 00:00:33,060
+city at night." Our DSPy pipeline breaks
+
+12
+00:00:33,119 --> 00:00:35,319
+that single sentence into four clear
+
+13
+00:00:35,400 --> 00:00:38,659
+parts, elements, meaning who or what is in
+
+14
+00:00:38,720 --> 00:00:40,940
+the scene, objects, meaning what they
+
+15
+00:00:41,000 --> 00:00:43,479
+look like and what's present, actions,
+
+16
+00:00:43,540 --> 00:00:45,180
+meaning what's happening, and
+
+17
+00:00:45,279 --> 00:00:47,839
+cinematography, meaning the camera angle,
+
+18
+00:00:47,920 --> 00:00:51,299
+lighting, composition, and mood. Each
+
+19
+00:00:51,380 --> 00:00:53,879
+composable element stays in its own lane,
+
+20
+00:00:53,939 --> 00:00:56,560
+so every detail is clearly labeled, easy
+
+21
+00:00:56,599 --> 00:00:58,799
+to edit, and never spills into the wrong
+
+22
+00:00:58,860 --> 00:01:02,000
+part of the prompt. Phase 2 is generation
+
+23
+00:01:02,020 --> 00:01:04,459
+and validation. We generate multiple
+
+24
+00:01:04,540 --> 00:01:06,319
+images using Nano Banana Pro.
+
+25
+00:01:07,139 --> 00:01:09,819
+Each result is scored by Joy Quality, a
+
+26
+00:01:09,919 --> 00:01:12,739
+fine-tuned SIGlib2 encoder model trained
+
+27
+00:01:12,779 --> 00:01:15,179
+on pairwise preference, which ranks both
+
+28
+00:01:15,239 --> 00:01:18,599
+aesthetic appeal and technical quality.
+
+29
+00:01:18,680 --> 00:01:20,859
+Then our VLM guardrails checks that the
+
+30
+00:01:20,940 --> 00:01:23,499
+image actually aligns with the prompt and
+
+31
+00:01:23,559 --> 00:01:25,979
+matches what you asked for. And here's the
+
+32
+00:01:26,040 --> 00:01:28,139
+best part. If you wanna change a
+
+33
+00:01:28,199 --> 00:01:30,559
+particular component, like make it golden
+
+34
+00:01:30,599 --> 00:01:32,679
+hour lighting, we only regenerate the
+
+35
+00:01:32,739 --> 00:01:34,860
+cinematography part. That makes
+
+36
+00:01:34,919 --> 00:01:38,519
+refinements fast, cheap, and predictable.
+
+37
+00:01:38,579 --> 00:01:40,859
+We also integrated Freepik semantic search
+
+38
+00:01:40,900 --> 00:01:43,119
+for reference images, and you can control
+
+39
+00:01:43,159 --> 00:01:45,199
+the entire workflow with your voice using
+
+40
+00:01:45,339 --> 00:01:49,559
+Gemini's live API. Scene Naps, composable
+
+41
+00:01:49,619 --> 00:01:52,459
+prompts, validated generations, and real
+
+42
+00:01:52,500 --> 00:01:55,379
+control over your creative vision. Thank
+
+43
+00:01:55,399 --> 00:01:55,779
+you.
+

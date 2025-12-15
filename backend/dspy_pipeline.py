@@ -34,12 +34,17 @@ from .dspy_signatures import (
     SceneSummary,
 )
 
-Model constants
-MODEL_DEFAULT = "gemini/gemini-flash-latest"  # Fast, text-only
-MODEL_MULTIMODAL = "gemini/gemini-3-pro-preview"  # For image/video/audio
-MODEL_SUMMARY = "gemini/gemini-3-pro-preview"  # Best at respecting token limits
+# # Model constants
+# MODEL_DEFAULT = "gemini/gemini-flash-latest"  # Fast, text-only
+# MODEL_MULTIMODAL = "gemini/gemini-3-pro-preview"  # For image/video/audio
+# MODEL_SUMMARY = "gemini/gemini-3-pro-preview"  # Best at respecting token limits
+# MODEL_CRITIC = "gemini/gemini-2.5-flash-lite"  # Fast, cheap for critic
+
+# Model constants
+MODEL_DEFAULT = "openai/gpt-5.2"  # Fast, text-only
+MODEL_MULTIMODAL = "gemini/gemini-2.5-flash-lite"  # For image/video/audio
+MODEL_SUMMARY = "gemini/gemini-2.5-flash-lite"  # Best at respecting token limits
 MODEL_CRITIC = "gemini/gemini-2.5-flash-lite"  # Fast, cheap for critic
-Model constants
 
 # Pipeline constants
 CRITIC_THRESHOLD = 0.85  # Minimum acceptable critic score

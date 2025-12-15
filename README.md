@@ -165,6 +165,7 @@ When verification fails, the system provides:
 | **SigLIP2** | Google's vision encoder (JoyQuality base) | [arXiv:2502.14786](https://arxiv.org/abs/2502.14786) |
 | **Nano Banana Pro** | Streaming image generation | - |
 | **Gemini** | LLM backend for DSPy and VLM Guardrails | [Google AI](https://ai.google.dev/) |
+| **Gemini Live API** | Real-time voice control with function calling | [Live API Docs](https://ai.google.dev/gemini-api/docs/live) |
 | **Freepik** | Reference image search | [Freepik API](https://www.freepik.com/api) |
 
 ---
@@ -213,6 +214,31 @@ cd frontend && npm run dev
 
 Then open http://localhost:3000 in your browser.
 
+### Voice Assistant (Optional)
+
+Control SceneNapse with voice using the Gemini Live API:
+
+```bash
+# Requires pyaudio - install system dependencies first:
+# Ubuntu/Debian: sudo apt-get install portaudio19-dev
+# macOS: brew install portaudio
+
+# Start the backend first, then run:
+uv run python -m backend.voice_assistant
+```
+
+**Voice commands:**
+- "Search for images of [query]" - Find reference images
+- "Select reference image [number]" - Pick a reference
+- "Create a scene about [description]" - Generate scene
+- "Refine the scene to [instruction]" - Modify scene
+- "Generate images" - Create images from scene
+- "Select image [number]" - Pick generated image
+- "What's the status?" - Check current state
+- "Clear everything" - Start over
+
+**Note:** Use headphones to prevent echo feedback.
+
 ---
 
 ## Project Structure
@@ -229,7 +255,8 @@ scenenapse/
 │   ├── dspy_refinement.py # Smart refinement routing
 │   ├── dspy_signatures.py # DSPy signatures for each head
 │   ├── dspy_guardrails.py # VLM image-prompt alignment verification
-│   └── joy_quality.py     # SigLIP2 pairwise preference quality scoring
+│   ├── joy_quality.py     # SigLIP2 pairwise preference quality scoring
+│   └── voice_assistant.py # Gemini Live API voice control
 ├── frontend/              # Next.js UI
 │   ├── app/page.tsx       # Main application component
 │   ├── app/api/           # Next.js API routes (proxy to backend)
