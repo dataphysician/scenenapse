@@ -16,6 +16,7 @@ build/
 # IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 
@@ -26,6 +27,12 @@ build/
 # Output (keep examples, ignore temp)
 output/temp/
 output/bad_examples/
+
+# Node
+node_modules/
+
+# Next.js
+.next/
 
 # OS
 .DS_Store

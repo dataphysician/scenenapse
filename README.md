@@ -1,367 +1,269 @@
-# Scenenapse
+# SceneNapse Studio
 
-**A VISTA-inspired prompt optimization framework for text-to-image generation using SigLIP2-based quality scoring and DSPy's GEPA optimizer.**
+**Multi-head DSPy pipeline for cinematic scene composition and text-to-image generation with quality scoring and prompt alignment verification.**
+
+---
+
+## Complete Workflow
+
+SceneNapse operates in two phases: **Prompt Enhancement** transforms text into structured scene descriptions, then **Image Generation & Validation** produces and verifies images against the prompt.
+
+### Phase 1: Prompt Enhancement
 
 <p align="center">
-  <img src="output/good_examples/good_1765065115_s0.png" width="400" alt="Example output: Dramatic sunset over mountains">
+  <img src="frontend/public/workflow-infographic.jpeg" width="600" alt="Prompt Enhancement Pipeline">
 </p>
+
+User prompts (with optional multimodal inputs) are decomposed into a structured **Scene Ontology** with four parallel heads: Objects, Actions, and Cinematography—all grounded in the Elements layer.
+
+### Phase 2: Image Generation & Validation
+
+<p align="center">
+  <img src="frontend/public/workflow-infographic2.jpeg" width="400" alt="Image Generation & Validation Pipeline">
+</p>
+
+The enriched scene description drives image generation (Nano Banana Pro), with **JoyQuality** scoring candidates and **VLM Guardrails** verifying prompt alignment.
 
 ---
 
 ## Overview
 
-Scenenapse adapts Google's [VISTA](https://arxiv.org/abs/2510.15831) self-improving agent architecture from video to **text-to-image generation**, achieving faster iteration cycles through:
+SceneNapse Studio transforms simple text prompts into **structured, composable scene descriptions** using a 3-stage DSPy pipeline. Each scene is decomposed into four independent "heads" (Elements, Objects, Actions, Cinematography) that can be refined individually or regenerated together.
 
-- **Streaming image generation** with parallel seed variations
-- **Real-time quality scoring** via SigLIP2 embeddings (no batch waiting)
-- **Structured JSON prompts** using Bria AI's FIBO schema
-- **GEPA-optimized prompt rewriting** for feedback-driven refinement
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        SCENENAPSE PIPELINE                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│   User Prompt ──► FIBO Generator ──► Structured JSON Prompt         │
-│                        │                                            │
-│                        ▼                                            │
-│              ┌─────────────────────┐                                │
-│              │  Nano Banana Pro    │  (Gemini 3 Pro Image)          │
-│              │  Parallel Seeds     │──────────┐                     │
-│              └─────────────────────┘          │                     │
-│                        │                      │                     │
-│                  [streaming]            [streaming]                 │
-│                        ▼                      ▼                     │
-│              ┌─────────────────────────────────────┐                │
-│              │      JoyQuality Selector            │                │
-│              │   (SigLIP2 quality scoring)         │                │
-│              │   Select best as images arrive      │                │
-│              └─────────────────────────────────────┘                │
-│                              │                                      │
-│                              ▼                                      │
-│              ┌───────────────────────────────┐                      │
-│              │  Quality Checker (FIBO spec)  │                      │
-│              │  Alignment Checker (intent)   │                      │
-│              └───────────────────────────────┘                      │
-│                              │                                      │
-│                    ┌────────┴────────┐                              │
-│                    ▼                 ▼                              │
-│               [PASS]            [FAIL]                              │
-│                 │                  │                                │
-│                 ▼                  ▼                                │
-│            Return Image    Prompt Rewriter (GEPA)                   │
-│                                    │                                │
-│                                    └──────► Loop back to FIBO       │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+This architecture enables:
+- **Precise control** over visual elements, motion, and cinematography
+- **Targeted refinements** that only regenerate affected components
+- **Lane separation** preventing content leakage between semantic domains
+- **Quality assurance** via JoyQuality scoring and VLM Guardrails
 
 ---
 
-## Key Technologies
+## The 4-Head Scene Model
 
-### Google VISTA
+Each head uses standard cinematic terminology and owns its domain exclusively.
 
-[VISTA](https://g-vista.github.io/) (Video Iterative Self-improvemenT Agent) is Google's multi-agent system for autonomous video generation improvement through iterative prompt refinement. It achieves **60% better objective benchmarks** and **66.4% human preference** over baselines by using structured scene planning, pairwise tournament selection, and multi-dimensional critiques.
+| Head | Purpose | Example Fields |
+|------|---------|----------------|
+| **Elements** | WHO/WHAT exists in the scene | `element_id`, `role`, `entity_type`, `importance` |
+| **Objects** | Visual appearance & physical details | `description`, `shape_and_color`, `texture`, `pose` |
+| **Actions** | Physical motion & dynamics | `action_class`, `stage_class`, `temporal_context` |
+| **Cinematography** | Camera, lighting, mood, style | `shot_size`, `camera_angle`, `lighting`, `artistic_style` |
 
-<p align="center">
-  <img src="assets/vista-workflow.png" width="800" alt="VISTA Workflow">
-  <br>
-  <em>Figure 1: The workflow of VISTA's multi-agent framework. (Source: <a href="https://arxiv.org/abs/2510.15831">Long et al., 2025</a>)</em>
-</p>
+### Cinematography Values
 
-**Scenenapse adapts this for T2I** by replacing video-specific components with image-focused alternatives while preserving the core self-improvement loop:
-
-| VISTA Component | Scenenapse Equivalent |
-|-----------------|----------------------|
-| 1. Structured Video Prompt Planning | FIBO JSON Generator |
-| 2. Binary Tournament Selection | JoyQuality SigLIP2 Scoring |
-| 3. Multi-Agent Critiques | Quality + Alignment Checkers |
-| 4. Deep Thinking Prompting Agent | GEPA-Optimized Rewriter |
-
-| Paper | [arXiv:2510.15831](https://arxiv.org/abs/2510.15831) |
-|-------|------------------------------------------------------|
-| Project | [g-vista.github.io](https://g-vista.github.io/) |
+| Category | Options |
+|----------|---------|
+| **Shot Size** | `extreme_close_up`, `close_up`, `medium_close_up`, `medium`, `medium_long`, `long`, `extreme_long` |
+| **Camera Angle** | `eye_level`, `low_angle`, `high_angle`, `dutch_angle`, `birds_eye`, `worms_eye` |
+| **Lighting** | `soft natural daylight`, `harsh midday sun`, `golden hour warmth`, `cool moonlight`, `neon city lights` |
+| **Artistic Style** | `photorealistic`, `hyperrealistic`, `impressionistic`, `noir`, `anime`, `surrealist`, `minimalist` |
 
 ---
 
-### FIBO (Bria AI)
+## Lane Separation
 
-[FIBO](https://github.com/Bria-AI/FIBO) is the first open-source **JSON-native text-to-image model** trained on structured captions (~1,000 words each). It enables disentangled control over individual visual attributes without prompt drift.
+Each head owns its domain exclusively, preventing content from leaking into the wrong component:
 
-**Key capabilities:**
-- **VLM-Guided JSON Prompting**: Expands short prompts into rich schemas covering lighting, camera, composition, DoF
-- **Disentangled Control**: Adjust camera angle, lighting, or color without affecting other attributes
-- **Enterprise-Grade**: 100% licensed training data
+| Content Type | Belongs In | NOT In |
+|--------------|------------|--------|
+| "woman in red dress" | Objects | Elements |
+| "runs gracefully" | Actions | Objects |
+| "dramatic lighting" | Cinematography | Actions |
+| "romantic mood" | Cinematography | Objects |
 
-```json
-{
-  "description": "Dramatic mountain landscape",
-  "objects": [{"description": "snow-capped peaks", "location": "background"}],
-  "background_setting": "Alpine valley at golden hour",
-  "lighting": "Warm rim lighting, god rays through clouds",
-  "photographic_characteristics": "Wide angle, f/11, 24mm lens",
-  "style_medium": "Photography",
-  "artistic_style": "Landscape realism"
-}
-```
-
-| GitHub | [Bria-AI/FIBO](https://github.com/Bria-AI/FIBO) |
-|--------|------------------------------------------------|
-| HuggingFace | [briaai/FIBO](https://huggingface.co/briaai/FIBO) |
-| API | [fal.ai/models/bria/fibo](https://fal.ai/models/bria/fibo/generate) |
+The **Critic** validates lane separation and scores consistency (0.0-1.0). Scenes below the threshold (0.85) are automatically regenerated.
 
 ---
 
-### JoyQuality + SigLIP2
+## JoyQuality Image Selector
 
-[JoyQuality](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) is a **400M parameter image quality regression model** built on Google's [SigLIP2](https://arxiv.org/abs/2502.14786) vision encoder. It scores images 0-1 for aesthetic and technical quality.
+**Pairwise preference finetuned encoder-only model** for image quality scoring.
 
-**SigLIP2** improves on SigLIP with:
-- Decoder-based pretraining + self-distillation
-- Better localization and dense feature extraction
-- Multilingual support (109 languages)
-- Dynamic resolution (NaFlex) variants
+| Property | Value |
+|----------|-------|
+| **Model** | [fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
+| **Base** | Google SigLIP2-so400m-patch14-384 vision encoder |
+| **Training** | Pairwise preference finetuning on aesthetic/technical quality |
+| **Output** | Quality score 0-1 (sigmoid normalized) |
 
-**Why this matters for latency:**
-Instead of waiting for all N seed variations to complete before scoring, Scenenapse scores each image **immediately as it streams in**, enabling early stopping when a high-quality candidate is found.
+### How It Works
 
-| JoyQuality | [HuggingFace](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
-|------------|-------------------------------------------------------------------------------------------|
-| SigLIP2 Paper | [arXiv:2502.14786](https://arxiv.org/abs/2502.14786) |
-| SigLIP2 Models | [google/siglip2-so400m-patch14-384](https://huggingface.co/google/siglip2-so400m-patch14-384) |
+JoyQuality uses a **400M parameter encoder-only architecture** trained on pairwise human preferences to predict image quality without needing a text prompt. It evaluates:
 
----
+- **Aesthetic quality** - composition, color harmony, visual appeal
+- **Technical quality** - sharpness, noise, artifacts, exposure
 
-### DSPy
-
-[DSPy](https://dspy.ai/) is Stanford NLP's framework for **programming—not prompting—language models**. It replaces brittle prompt engineering with compositional Python modules and automatic optimization.
-
-**Core concepts:**
-- **Signatures**: Declarative input/output specs (like type hints for LLMs)
-- **Modules**: `dspy.ChainOfThought`, `dspy.ReAct`, etc.
-- **Optimizers**: Compile programs to tune prompts/weights automatically
+### Usage in SceneNapse
 
 ```python
-class QualityChecker(dspy.Module):
-    def __init__(self):
-        self.check = dspy.ChainOfThought(QualityCheckerSignature)
+# Score a single image
+score = selector.score_image(pil_image)  # Returns 0.0-1.0
 
-    def forward(self, image: dspy.Image, json_prompt: dict):
-        return self.check(image=image, json_prompt=json.dumps(json_prompt))
+# Select best from batch
+best_image, best_idx, best_score = selector.select_best(images)
+
+# Rank all candidates
+ranked = selector.rank_images(images)  # [(idx, score), ...] sorted desc
 ```
 
-| Website | [dspy.ai](https://dspy.ai/) |
-|---------|----------------------------|
-| GitHub | [stanfordnlp/dspy](https://github.com/stanfordnlp/dspy) |
+Images are scored **as they stream in** from generation, enabling early stopping when a high-quality candidate is found.
 
 ---
 
-### GEPA Optimizer
+## VLM Guardrails
 
-[GEPA](https://arxiv.org/abs/2507.19457) (Genetic-Pareto) is DSPy's reflective prompt optimizer that **outperforms reinforcement learning** by up to 20% while using 35x fewer rollouts.
+**Multimodal LLM verification** ensuring generated images align with the structured scene prompt.
 
-**How it works:**
-1. Maintains a **Pareto frontier** of candidates (not just the global best)
-2. Uses LLM reflection on execution traces to identify improvements
-3. Samples mutations from the frontier proportional to coverage
-4. Evolves robust, high-performing prompts iteratively
+### 4 Verification Components
 
-**Results:** Starting from a basic `dspy.ChainOfThought("question -> answer")` at 67% on MATH, GEPA evolves to **93% accuracy**.
+Each component returns a binary score (0 = fail, 1 = pass):
 
-In Scenenapse, GEPA optimizes the `PromptRewriter` module to learn from failed generation attempts.
+| Component | Question | Checks |
+|-----------|----------|--------|
+| **VerifyElements** | Are all elements present? | Characters, objects, settings visible in image |
+| **VerifyObjects** | Do descriptions match? | Visual appearance, colors, textures, pose accuracy |
+| **VerifyActions** | Are actions visible? | Motion, dynamics, temporal context implied |
+| **VerifyCinematography** | Does camera/lighting match? | Shot size, angle, lighting, composition, style |
 
-| Paper | [arXiv:2507.19457](https://arxiv.org/abs/2507.19457) |
-|-------|-----------------------------------------------------|
-| GitHub | [gepa-ai/gepa](https://github.com/gepa-ai/gepa) |
-| DSPy Docs | [dspy.ai/api/optimizers/GEPA](https://dspy.ai/api/optimizers/GEPA/overview/) |
+### Scoring
+
+- **Component scores**: 0 (fail) or 1 (pass) each
+- **Total score**: 0-4 (sum of components)
+- **Pass criteria**: All 4 components must pass (score = 4)
+
+### Verification Result
+
+```python
+ImageVerificationResult(
+    passed=True,              # All components passed
+    total_score=4,            # 0-4
+    elements_score=1,         # Binary: 0 or 1
+    objects_score=1,
+    actions_score=1,
+    cinematography_score=1,
+    missing_elements=[],      # Element IDs not found
+    critical_issues=[],       # Why components failed
+    suggestions=[],           # How to improve
+)
+```
+
+### Failure Handling
+
+When verification fails, the system provides:
+- **Critical issues**: Which components failed and why
+- **Suggestions**: Specific improvements (e.g., "Adjust camera angle to match specification")
+- **Missing elements**: Which scene elements weren't rendered
 
 ---
 
-## How Scenenapse Improves on VISTA
+## Technologies
 
-| Aspect | VISTA (Video) | Scenenapse (Image) |
-|--------|---------------|-------------------|
-| **Generation** | Sequential scene rendering | Parallel seed streaming |
-| **Quality Scoring** | Post-hoc tournament selection | Real-time SigLIP2 scoring |
-| **Prompt Structure** | 9-attribute scene plan | FIBO JSON schema |
-| **Optimization** | Deep Thinking Prompting Agent | GEPA-trained rewriter |
-| **Latency** | Minutes (video rendering) | Seconds (streaming + early stop) |
-
----
-
-## Components
-
-| Component | Description | Model |
-|-----------|-------------|-------|
-| **FIBO Generator** | Text → Structured JSON | Gemini 2.0 Flash |
-| **Nano Banana Pro** | JSON → Image (parallel seeds) | Gemini 3 Pro Image |
-| **JoyQuality Selector** | Image → Quality score | SigLIP2-so400m |
-| **Quality Checker** | FIBO spec compliance | Gemini 2.5 Flash Lite |
-| **Alignment Checker** | User intent fulfillment | Gemini 2.5 Flash Lite |
-| **Prompt Rewriter** | Feedback → Improved prompt | Gemini 2.0 Flash (GEPA-optimized) |
+| Technology | Purpose | Link |
+|------------|---------|------|
+| **DSPy** | Programming LLM modules (not prompting) | [dspy.ai](https://dspy.ai/) |
+| **JoyQuality** | Pairwise preference encoder for image quality | [HuggingFace](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
+| **SigLIP2** | Google's vision encoder (JoyQuality base) | [arXiv:2502.14786](https://arxiv.org/abs/2502.14786) |
+| **Nano Banana Pro** | Streaming image generation | - |
+| **Gemini** | LLM backend for DSPy and VLM Guardrails | [Google AI](https://ai.google.dev/) |
+| **Freepik** | Reference image search | [Freepik API](https://www.freepik.com/api) |
 
 ---
 
 ## Setup
 
-### 1. Clone the Repository
+### Prerequisites
 
-```bash
-git clone https://github.com/dataphysician/scenenapse.git
-cd scenenapse
-```
+- Python 3.10+
+- Node.js 18+
+- [uv](https://github.com/astral-sh/uv) (Python package manager)
 
-### 2. Create and Activate Virtual Environment
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# or
-.venv\Scripts\activate     # Windows
-```
-
-### 3. Install Python Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Set API Key
+### Environment Variables
 
 ```bash
 export GOOGLE_API_KEY="your-gemini-api-key"
-# or
-export GEMINI_API_KEY="your-gemini-api-key"
+export FAL_KEY="your-fal-api-key"
+export FREEPIK_API_KEY="your-freepik-api-key"  # Optional, for reference images
 ```
 
-You can get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
-
----
-
-## Running the Application
-
-### Option A: Next.js Frontend (Recommended)
-
-This provides a modern, responsive UI with real-time streaming updates.
-
-**Terminal 1 - Start the Backend Server:**
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/dataphysician/scenenapse.git
 cd scenenapse
-source .venv/bin/activate
-python src/server.py
+
+# Install Python dependencies
+uv sync
+
+# Install frontend dependencies
+cd frontend && npm install
 ```
 
-The FastAPI server will start at `http://localhost:8000`.
+### Running
 
-**Terminal 2 - Start the Frontend:**
-
+**Backend** (FastAPI on port 8000):
 ```bash
-cd scenenapse/frontend
-npm install        # First time only
-npm run dev
+uv run python main.py
 ```
 
-Open `http://localhost:3000` in your browser.
+**Frontend** (Next.js on port 3000):
+```bash
+cd frontend && npm run dev
+```
 
-**Features:**
-- **Mode Selection**: Toggle between "Prompt Optimization" (VISTA loop) or "Nano Banana Pro" (fast)
-- **Image Grid**: View all 10 generated variations in a 5-column grid (click to expand)
-- **FIBO JSON Display**: See structured prompts in the System Logs panel
-- **Real-time Scoring**: JoyQuality scores displayed for each seed
-- **Live Evaluation**: Watch Quality and Alignment checkers run with pass/fail indicators
-- **Auto-Rewrite**: Failed prompts automatically rewritten and retried
-- **History Sidebar**: Track previous generations
+Then open http://localhost:3000 in your browser.
 
 ---
 
-### Option B: Gradio Frontend
+## Project Structure
 
-A simpler alternative using Gradio (no Node.js required).
-
-```bash
-cd scenenapse
-source .venv/bin/activate
-python frontend/app.py
 ```
-
-Open `http://localhost:7860` in your browser.
-
----
-
-### Option C: CLI Pipeline
-
-Run the optimizer directly from the command line:
-
-```bash
-cd scenenapse
-source .venv/bin/activate
-python -m src.prompt_optimizer
+scenenapse/
+├── api/                    # FastAPI routes and state management
+│   ├── main.py            # App entry point with CORS config
+│   ├── routes.py          # API endpoints
+│   ├── state.py           # In-memory scene state
+│   └── schemas.py         # Pydantic models
+├── backend/               # DSPy pipeline and signatures
+│   ├── dspy_pipeline.py   # 3-stage generation pipeline
+│   ├── dspy_refinement.py # Smart refinement routing
+│   ├── dspy_signatures.py # DSPy signatures for each head
+│   ├── dspy_guardrails.py # VLM image-prompt alignment verification
+│   └── joy_quality.py     # SigLIP2 pairwise preference quality scoring
+├── frontend/              # Next.js UI
+│   ├── app/page.tsx       # Main application component
+│   ├── app/api/           # Next.js API routes (proxy to backend)
+│   └── lib/types.ts       # TypeScript type definitions
+├── main.py                # Backend entry point
+└── pyproject.toml         # Python dependencies
 ```
 
 ---
 
-## Run Individual Components
+## API Endpoints
 
-```bash
-# FIBO Generator (Text → JSON prompt)
-python src/fibo_generator.py
+### Core Operations
 
-# JoyQuality Selector (Image → Quality score)
-python src/joy_quality.py
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/generate` | POST | Generate complete scene from prompt |
+| `/api/refine` | POST | Refine existing scene with instruction |
+| `/api/assemble` | POST | Validate manually-edited scene |
 
-# Nano Banana Pro API (JSON → Image)
-python src/nano_banana.py
+### Image Operations
 
-# GEPA Trainer (Optimize prompt rewriter)
-python src/gepa_trainer.py
-```
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/generate-images-stream` | GET | Stream generated images (SSE) with JoyQuality scores |
+| `/api/search-images` | POST | Search reference images via Freepik |
+| `/api/select-reference` | POST | Select reference image for generation |
+| `/api/select-generated` | POST | Select generated image |
 
----
+### Scene State
 
-## Troubleshooting
-
-### Module not found errors
-
-Ensure you're using the virtual environment's Python:
-
-```bash
-./.venv/bin/python src/server.py
-# or
-./.venv/bin/python frontend/app.py
-```
-
-### DSPy "No LM is loaded" error
-
-Make sure your API key is set before starting the server:
-
-```bash
-export GOOGLE_API_KEY="your-key"
-python src/server.py
-```
-
-### Frontend can't connect to backend
-
-1. Verify the backend is running on port 8000
-2. Check for CORS errors in browser console
-3. Ensure both servers are running simultaneously (2 terminals)
-
-### npm install fails
-
-```bash
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-```
-
----
-
-## References
-
-- **VISTA**: Long et al., "VISTA: A Test-Time Self-Improving Video Generation Agent" [arXiv:2510.15831](https://arxiv.org/abs/2510.15831)
-- **FIBO**: Bria AI, "JSON-Native Text-to-Image Model" [GitHub](https://github.com/Bria-AI/FIBO)
-- **SigLIP2**: Google DeepMind, "Multilingual Vision-Language Encoders" [arXiv:2502.14786](https://arxiv.org/abs/2502.14786)
-- **DSPy**: Khattab et al., Stanford NLP [dspy.ai](https://dspy.ai/)
-- **GEPA**: Agrawal et al., "Reflective Prompt Evolution Can Outperform Reinforcement Learning" [arXiv:2507.19457](https://arxiv.org/abs/2507.19457)
-- **OPT2I**: Mañas et al., "Improving Text-to-Image Consistency via Automatic Prompt Optimization" [arXiv:2403.17804](https://arxiv.org/abs/2403.17804)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/scene` | GET | Get current scene state |
+| `/api/scene` | DELETE | Clear scene state |
+| `/api/scene/{head}` | PUT | Update specific head (elements/objects/actions/cinematography) |
+| `/api/scene/assembled` | GET | Get finalized scene with summary |

@@ -1,22 +1,25 @@
 [project]
-name = "scenenapse"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.12"
+name = "scenenapse-studio"
+version = "1.0.0"
+description = "AI-powered cinematic scene composition using DSPy"
+requires-python = ">=3.10"
 dependencies = [
-    "accelerate>=1.12.0",
-    "boltons>=25.0.0",
-    "diffusers>=0.35.2",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.9",
     "dspy-ai>=2.5.0",
-    "fastapi>=0.124.0",
-    "google-genai>=1.53.0",
-    "gradio>=6.0.2",
-    "pillow>=10.0.0",
-    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+    "google-genai>=1.0.0",
+    "fal-client>=0.10.0",
     "torch>=2.0.0",
-    "torchvision>=0.24.1",
+    "torchvision>=0.15.0",
     "transformers>=4.40.0",
-    "ujson>=5.11.0",
-    "uvicorn>=0.38.0",
+    "Pillow>=10.0.0",
+    "requests>=2.31.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "httpx>=0.27.0",
 ]
