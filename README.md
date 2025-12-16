@@ -81,6 +81,7 @@ The **Critic** validates lane separation and scores consistency (0.0-1.0). Scene
 
 | Property | Value |
 |----------|-------|
+| **GitHub** | [https://github.com/fpgaminer/joyquality](https://github.com/fpgaminer/joyquality) |
 | **Model** | [fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
 | **Base** | Google SigLIP2-so400m-patch14-384 vision encoder |
 | **Training** | Pairwise preference finetuning on aesthetic/technical quality |
@@ -161,7 +162,7 @@ When verification fails, the system provides:
 | Technology | Purpose | Link |
 |------------|---------|------|
 | **DSPy** | Programming LLM modules (not prompting) | [dspy.ai](https://dspy.ai/) |
-| **JoyQuality** | Pairwise preference encoder for image quality | [HuggingFace](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
+| **JoyQuality** | Pairwise preference encoder for image quality | [GitHub](https://github.com/fpgaminer/joyquality)  [HuggingFace](https://huggingface.co/fancyfeast/joyquality-siglip2-so400m-512-16-o8eg1n4c) |
 | **SigLIP2** | Google's vision encoder (JoyQuality base) | [arXiv:2502.14786](https://arxiv.org/abs/2502.14786) |
 | **Nano Banana Pro** | Streaming image generation | - |
 | **Gemini** | LLM backend for DSPy and VLM Guardrails | [Google AI](https://ai.google.dev/) |
